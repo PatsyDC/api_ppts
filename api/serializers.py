@@ -11,7 +11,13 @@ class UserSerializer(serializers.ModelSerializer):
 class PresentationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Presentation
-        fields = '__all__'
+        fields = ['id', 'user', 'description', 'image_before', 'image_after', 'fecha']
+        
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        # Asegurarnos de que la fecha se formatea correctamente
+        representation['fecha'] = instance.fecha.strftime('%Y-%m-%d')
+        return representation
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])

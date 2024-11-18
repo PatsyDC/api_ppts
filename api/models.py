@@ -12,7 +12,6 @@ class UserToken(models.Model):
 
 class Presentation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="presentations")
-    title = models.CharField(max_length=255)
     description = models.TextField()
     image_before = models.ImageField(upload_to='slides/')
     image_after = models.ImageField(upload_to='slides/')
