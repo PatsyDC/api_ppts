@@ -12,6 +12,9 @@ from .models import *
 from .serializers import *
 from django.db.models import Q
 from datetime import datetime
+from rest_framework.permissions import IsAuthenticated
+from django.http import JsonResponse
+
 
 class CustomTokenObtainPairView(APIView):
     def post(self, request):
@@ -52,6 +55,11 @@ class UserDetailView(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
+class UserListView(generics.ListAPIView):
+    queryset = User.objects.all()  # Obtiene todos los usuarios
+    serializer_class = UserSerializer 
+
+    
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
@@ -104,3 +112,18 @@ class PresentationListCreateView(generics.ListCreateAPIView):
 class PresentationRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Presentation.objects.all()
     serializer_class = PresentationSerializer
+
+class PresentacionesPorFecha(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        fecha = request.GET.get('fecha')
+        user = request.GET.get('user')
+
+        if request.user.is_staff:
+            presentaciones = Presentation.objects.filter(fecha=fecha)
+        else:
+            presentaciones = Presentation.objects.filter(fecha=fecha, user_id=user)
+
+        serializer = PresentationSerializer(presentaciones, many=True)
+        return JsonResponse(serializer.data, safe=False)
